@@ -72,3 +72,10 @@ def create_volunteer():
 def get_volunteers():
     volunteers = Volunteer.query.all()
     return jsonify({"volunteers": [s.to_dict() for s in volunteers]}), 200
+
+
+def get_volunteer(volunteer_id):
+    volunteer = Volunteer.query.get(volunteer_id)
+    if not volunteer:
+        return jsonify({"error": "Volunteer not found."}), 404
+    return jsonify({"volunteer": volunteer.to_dict()}), 200
