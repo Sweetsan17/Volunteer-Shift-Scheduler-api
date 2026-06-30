@@ -79,3 +79,40 @@ def get_volunteer(volunteer_id):
     if not volunteer:
         return jsonify({"error": "Volunteer not found."}), 404
     return jsonify({"volunteer": volunteer.to_dict()}), 200
+
+
+def update_volunteer(volunteer_id):
+    volunteer = Volunteer.query.get(volunteer_id)
+    if not volunteer:
+        return jsonify({"error": "Volunteer not found."}), 404
+
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({"error": "No data provided to update."}), 400
+
+    errors = _validate_volunteer_payload(data, volunteer_id=volunteer_id)
+    if errors:
+        return jsonify({"errors": errors}), 400
+    try:
+        volunteer.full_name = data.get("full_name").strip()
+        volunteer.email = data.get("email").strip()
+        volunteer.age = int(data.get("age"))
+
+        if "is_active" in data:
+            volunteer.is_active = bool(data.get("is_active"))
+
+        db.session.commit()
+        return (
+            jsonify(
+                {
+                    "message": "Volunteer updated successfully.",
+                    "volunteer": volunteer.to_dict(),
+                }
+            ),
+            200,
+        )
+    except Exception:
+        db.session.rollback()
+        return jsonify({"error": "An internal server error occurred."}), 500
+
+    
