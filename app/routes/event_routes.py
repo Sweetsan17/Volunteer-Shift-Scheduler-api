@@ -8,3 +8,8 @@ event_bp = Blueprint("events", __name__, url_prefix=("/api/events"))
 @event_bp.route("", methods=["POST"])
 def create_event():
     return ctrl.create_event()
+
+
+@event_bp.route("", methods=["GET"])
+def get_events():
+    return ctrl.get_events()
