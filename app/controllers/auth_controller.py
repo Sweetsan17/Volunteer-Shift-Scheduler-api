@@ -44,3 +44,31 @@ def _validate_login_payload(data):
         errors.append("password is required.")
 
     return errors
+
+
+def register():
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({"error": "Request body is required."}), 400
+
+    errors = _validate_register_payload(data)
+    if errors:
+        return jsonify({"errors": errors}), 400
+
+    try:
+        user = User(
+            email=str(data.get("email")).strip(), role=data.get("role", "volunteer")
+        )
+        user.set_password(str(data.get("password")))
+
+        db.session.add(user)
+        db.session.commit()
+        return (
+            jsonify(
+                {"message": "User registered successfully.", "user": user.to_dict()}
+            ),
+            201,
+        )
+    except Exception:
+        db.session.rollback()
+        return jsonify({"error": "An internal server error occurred."}), 500
