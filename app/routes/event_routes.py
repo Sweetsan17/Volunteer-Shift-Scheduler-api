@@ -13,3 +13,8 @@ def create_event():
 @event_bp.route("", methods=["GET"])
 def get_events():
     return ctrl.get_events()
+
+
+@event_bp.route("/<int:event_id>", methods=["GET"])
+def get_event(event_id):
+    return ctrl.get_event(event_id)
