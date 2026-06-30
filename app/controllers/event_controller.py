@@ -29,3 +29,34 @@ def _validate_event_payload(data, event_id=None):
     return errors
 
 
+def create_event():
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({"error": "Request body is required."}), 400
+
+    errors = _validate_event_payload(data)
+    if errors:
+        return jsonify({"errors": errors}), 400
+
+    try:
+        event = Event(
+            event_name=data.get("event_name").strip(),
+            duration=float(data.get("duration")).strip(),
+            volunteer_role=data.get("volunteer_role").strip(),
+            description=data.get("description").strip(),
+            is_active=data.get("is_active", True),
+        )
+        db.session.add(event)
+        db.session.commit()
+        return (
+            jsonify(
+                {
+                    "message": "Event created successfully.",
+                    "event": event.to_dict(),
+                }
+            ),
+            201,
+        )
+    except Exception:
+        db.session.rollback()
+        return jsonify({"error": "An internal server error occurred."}), 500
