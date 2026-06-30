@@ -65,3 +65,10 @@ def create_event():
 def get_events():
     events = Event.query.all()
     return jsonify({"events": [s.to_dict() for s in events]}), 200
+
+
+def get_event(event_id):
+    event = Event.query.get(event_id)
+    if not event:
+        return jsonify({"error": "Event not found."}), 404
+    return jsonify({"event": event.to_dict()}), 200
