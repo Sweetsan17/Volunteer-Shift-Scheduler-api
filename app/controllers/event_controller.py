@@ -60,3 +60,8 @@ def create_event():
     except Exception:
         db.session.rollback()
         return jsonify({"error": "An internal server error occurred."}), 500
+
+
+def get_events():
+    events = Event.query.all()
+    return jsonify({"events": [s.to_dict() for s in events]}), 200
