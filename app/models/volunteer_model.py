@@ -6,7 +6,7 @@ class Volunteer(db.Model):
     __tablename__ = "volunteers"
 
     volunteer_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    id = db.Column(db.Integer, ForeignKey=("id", User.id))
+    id = db.Column(db.Integer, ForeignKey=(User.id))
     full_name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), nullable=False, unique=True)
     age = db.Column(db.Integer, nullable=False)
