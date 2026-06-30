@@ -5,8 +5,6 @@ from flask_jwt_extended import get_jwt, verify_jwt_in_request
 
 
 def roles_required(*allowed_roles):
-    """Restrict an endpoint to users whose role is in allowed_roles."""
-
     def decorator(fn):
         @wraps(fn)
         def wrapper(*args, **kwargs):
@@ -19,7 +17,5 @@ def roles_required(*allowed_roles):
         return wrapper
 
     return decorator
-
-
 
 admin_or_coordinator_required = roles_required("admin", "coordinator")

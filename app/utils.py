@@ -17,7 +17,6 @@ def error_response(message="error", status_code=400):
 
 
 def rows_to_csv_response(rows, fieldnames, filename):
-    """Build a Flask Response containing a CSV file download."""
     buffer = io.StringIO()
     writer = csv.DictWriter(buffer, fieldnames=fieldnames)
     writer.writeheader()
@@ -30,7 +29,6 @@ def rows_to_csv_response(rows, fieldnames, filename):
 
 
 def rows_to_pdf_response(title, rows, fieldnames, filename):
-    """Build a Flask Response containing a simple tabular PDF download."""
     pdf = FPDF(orientation="L", unit="mm", format="A4")
     pdf.add_page()
     pdf.set_font("Helvetica", "B", 14)
@@ -59,7 +57,6 @@ def rows_to_pdf_response(title, rows, fieldnames, filename):
 
 
 def parse_csv_upload(file_storage):
-    """Parse an uploaded CSV file into a list of dict rows."""
     content = file_storage.read().decode("utf-8-sig")
     reader = csv.DictReader(io.StringIO(content))
     return [

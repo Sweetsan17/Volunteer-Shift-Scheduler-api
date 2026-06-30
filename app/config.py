@@ -5,10 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-class Config:
-    """Base configuration, populated from environment variables."""
-
-   
+class Config: 
     DB_USER = os.environ.get("DB_USER", "root")
     DB_PASSWORD = os.environ.get("DB_PASSWORD", "root123")
     DB_HOST = os.environ.get("DB_HOST", "localhost")
