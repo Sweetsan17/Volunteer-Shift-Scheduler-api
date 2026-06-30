@@ -115,4 +115,15 @@ def update_volunteer(volunteer_id):
         db.session.rollback()
         return jsonify({"error": "An internal server error occurred."}), 500
 
-    
+
+def delete_volunteer(volunteer_id):
+    volunteer = Volunteer.query.get(volunteer_id)
+    if not volunteer:
+        return jsonify({"error": "Volunteer not found."}), 404
+    try:
+        db.session.delete(volunteer)
+        db.session.commit()
+        return jsonify({"message": "Volunteer deleted successfully."}), 200
+    except Exception:
+        db.session.rollback()
+        return jsonify({"error": "An internal server error occurred."}), 500
