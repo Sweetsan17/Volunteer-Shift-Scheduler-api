@@ -28,3 +28,19 @@ def _validate_register_payload(data):
         errors.append("password must be at least 6 characters long.")
 
     return errors
+
+
+def _validate_login_payload(data):
+    errors = []
+    if not data:
+        return ["Request body is required."]
+
+    email = data.get("email")
+    if email is None or str(email).strip() == "":
+        errors.append("email is required.")
+
+    password = data.get("password")
+    if password is None or str(password).strip() == "":
+        errors.append("password is required.")
+
+    return errors
