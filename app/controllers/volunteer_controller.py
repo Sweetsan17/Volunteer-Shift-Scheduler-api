@@ -34,3 +34,36 @@ def _validate_volunteer_payload(data, volunteer_id=None):
             errors.append("age must be a positive integer.")
 
     return errors
+
+
+def create_volunteer():
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({"error": "Request body is required."}), 400
+
+    errors = _validate_volunteer_payload(data)
+    if errors:
+        return jsonify({"errors": errors}), 400
+
+    try:
+        volunteer = Volunteer(
+            id=data.get("id").strip(),
+            full_name=data.get("full_name").strip(),
+            email=data.get("email").strip(),
+            age=int(data.get("age")),
+            is_active=data.get("is_active", True),
+        )
+        db.session.add(volunteer)
+        db.session.commit()
+        return (
+            jsonify(
+                {
+                    "message": "Volunteer created successfully.",
+                    "volunteer": volunteer.to_dict(),
+                }
+            ),
+            201,
+        )
+    except Exception:
+        db.session.rollback()
+        return jsonify({"error": "An internal server error occurred."}), 500
