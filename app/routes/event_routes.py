@@ -18,3 +18,8 @@ def get_events():
 @event_bp.route("/<int:event_id>", methods=["GET"])
 def get_event(event_id):
     return ctrl.get_event(event_id)
+
+
+@event_bp.route("/<int:event_id>", methods=["PUT"])
+def update_event(event_id):
+    return ctrl.update_event(event_id)
