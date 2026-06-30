@@ -67,3 +67,8 @@ def create_volunteer():
     except Exception:
         db.session.rollback()
         return jsonify({"error": "An internal server error occurred."}), 500
+
+
+def get_volunteers():
+    volunteers = Volunteer.query.all()
+    return jsonify({"volunteers": [s.to_dict() for s in volunteers]}), 200
