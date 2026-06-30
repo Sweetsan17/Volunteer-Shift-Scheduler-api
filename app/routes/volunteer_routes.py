@@ -23,3 +23,8 @@ def get_volunteer(volunteer_id):
 @volunteer_bp.route("/<int:volunteer_id>", methods=["PUT"])
 def update_volunteer(volunteer_id):
     return ctrl.update_volunteer(volunteer_id)
+
+
+@volunteer_bp.route("/<int:volunteer_id>", methods=["DELETE"])
+def update_volunteer(volunteer_id):
+    return ctrl.update_volunteer(volunteer_id)
