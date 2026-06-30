@@ -12,15 +12,14 @@ class User(db.Model):
     role = db.Column(db.String(20), nullable=False, default="volunteer")
 
     def set_password(self, password):
-        """Hash and set the user's password."""
+        # Hash and set the user's password.
         self.password = generate_password_hash(password)
 
     def check_password(self, password):
-        """Check the password against the stored hash."""
+        # Check the password the stored hash.
         return check_password_hash(self.password, password)
 
     def to_dict(self):
-        """Return a dictionary representation of the user."""
         return {
             "id": self.id,
             "email": self.email,
