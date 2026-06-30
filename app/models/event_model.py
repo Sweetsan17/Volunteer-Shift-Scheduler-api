@@ -3,7 +3,7 @@ from app.utils import utc_now
 
 
 class Event(db.Model):
-    __tablename__ = "courses"
+    __tablename__ = "event"
 
     event_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     event_name = db.Column(db.String(100), nullable=False, unique=True)
