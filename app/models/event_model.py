@@ -7,7 +7,9 @@ class Event(db.Model):
     __tablename__ = "events"
 
     event_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    volunteer_id = db.Column(db.Integer, ForeignKey=(Volunteer.volunteer_id))
+    volunteer_id = db.Column(
+        db.Integer, ForeignKey=("volunteer_id", Volunteer.volunteer_id)
+    )
     event_name = db.Column(db.String(100), nullable=False, unique=True)
     duration = db.Column(db.Integer, nullable=False)
     volunteer_role = db.Column(db.Text, nullable=False)
