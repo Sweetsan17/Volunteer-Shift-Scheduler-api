@@ -24,7 +24,7 @@ class Event(db.Model):
             "event_name": self.event_name,
             "duration": self.duration,
             "volunteer_role": self.volunteer_role,
-            "is_available": self.is_available,
+            "is_active": self.is_active,
             "description": self.description,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
