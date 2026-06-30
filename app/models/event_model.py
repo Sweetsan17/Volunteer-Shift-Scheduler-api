@@ -11,7 +11,7 @@ class Event(db.Model):
         db.Integer, ForeignKey=("volunteer_id", Volunteer.volunteer_id)
     )
     event_name = db.Column(db.String(100), nullable=False, unique=True)
-    duration = db.Column(db.Integer, nullable=False)
+    duration = db.Column(db.Float, nullable=False)
     volunteer_role = db.Column(db.Text, nullable=False)
     is_active = db.Column(db.Boolean, default=True)
     description = db.Column(db.Text, nullable=True)
