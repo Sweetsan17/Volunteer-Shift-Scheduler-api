@@ -72,3 +72,38 @@ def get_event(event_id):
     if not event:
         return jsonify({"error": "Event not found."}), 404
     return jsonify({"event": event.to_dict()}), 200
+
+
+def update_event(event_id):
+    event = Event.query.get(event_id)
+    if not event:
+        return jsonify({"error": "Event not found."}), 404
+
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({"error": "No data provided to update."}), 400
+
+    errors = _validate_event_payload(data, event_id=event_id)
+    if errors:
+        return jsonify({"errors": errors}), 400
+    try:
+        event.full_name = data.get("full_name").strip()
+        event.email = data.get("email").strip()
+        event.age = int(data.get("age"))
+
+        if "is_active" in data:
+            event.is_active = bool(data.get("is_active"))
+
+        db.session.commit()
+        return (
+            jsonify(
+                {
+                    "message": "Event updated successfully.",
+                    "event": event.to_dict(),
+                }
+            ),
+            200,
+        )
+    except Exception:
+        db.session.rollback()
+        return jsonify({"error": "An internal server error occurred."}), 500
