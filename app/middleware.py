@@ -1,23 +1,25 @@
 from functools import wraps
+
 from flask import jsonify
-from flask_jwt_extended import verify_jwt_in_request, current_user
+from flask_jwt_extended import get_jwt, verify_jwt_in_request
 
 
-def roles_required(*roles):
+def roles_required(*allowed_roles):
+    """Restrict an endpoint to users whose role is in allowed_roles."""
 
     def decorator(fn):
         @wraps(fn)
         def wrapper(*args, **kwargs):
             verify_jwt_in_request()
-            if not current_user:
-                return jsonify({"error": "User not found."}), 404
-            if current_user.role not in roles:
-                return (
-                    jsonify({"error": "Access forbidden: insufficient permissions."}),
-                    403,
-                )
+            claims = get_jwt()
+            if claims.get("role") not in allowed_roles:
+                return jsonify({"error": "You do not have permission to do this"}), 403
             return fn(*args, **kwargs)
 
         return wrapper
 
     return decorator
+
+
+
+admin_or_coordinator_required = roles_required("admin", "coordinator")
