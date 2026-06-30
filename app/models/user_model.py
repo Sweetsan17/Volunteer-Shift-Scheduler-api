@@ -1,5 +1,4 @@
 from app.extensions import db
-from app.utils import utc_now
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -7,11 +6,10 @@ class User(db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name=db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.String(20), nullable=False, default="student")
-    
+    role = db.Column(db.String(20), nullable=False, default="volunteer")
 
     def set_password(self, password):
         """Hash and set the user's password."""
@@ -28,5 +26,4 @@ class User(db.Model):
             "email": self.email,
             "role": self.role,
             "name": self.name,
-   
         }
