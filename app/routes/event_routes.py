@@ -23,3 +23,8 @@ def get_event(event_id):
 @event_bp.route("/<int:event_id>", methods=["PUT"])
 def update_event(event_id):
     return ctrl.update_event(event_id)
+
+
+@event_bp.route("/<int:event_id>", methods=["DELETE"])
+def delete_event(event_id):
+    return ctrl.delete_event(event_id)
