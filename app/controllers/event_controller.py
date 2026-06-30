@@ -107,3 +107,16 @@ def update_event(event_id):
     except Exception:
         db.session.rollback()
         return jsonify({"error": "An internal server error occurred."}), 500
+
+
+def delete_event(event_id):
+    event = Event.query.get(event_id)
+    if not event:
+        return jsonify({"error": "Event not found."}), 404
+    try:
+        db.session.delete(event)
+        db.session.commit()
+        return jsonify({"message": "Event deleted successfully."}), 200
+    except Exception:
+        db.session.rollback()
+        return jsonify({"error": "An internal server error occurred."}), 500
