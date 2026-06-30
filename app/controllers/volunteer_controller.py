@@ -47,7 +47,6 @@ def create_volunteer():
 
     try:
         volunteer = Volunteer(
-            id=data.get("id").strip(),
             full_name=data.get("full_name").strip(),
             email=data.get("email").strip(),
             age=int(data.get("age")),
