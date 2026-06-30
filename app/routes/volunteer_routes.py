@@ -13,3 +13,8 @@ def create_volunteer():
 @volunteer_bp.route("", methods=["GET"])
 def get_volunteers():
     return ctrl.get_volunteers()
+
+
+@volunteer_bp.route("/<int:volunteer_id>", methods=["GET"])
+def get_volunteer():
+    return ctrl.get_volunteer()
