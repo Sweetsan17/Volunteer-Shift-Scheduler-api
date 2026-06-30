@@ -26,5 +26,5 @@ def update_volunteer(volunteer_id):
 
 
 @volunteer_bp.route("/<int:volunteer_id>", methods=["DELETE"])
-def update_volunteer(volunteer_id):
-    return ctrl.update_volunteer(volunteer_id)
+def delete_volunteer(volunteer_id):
+    return ctrl.delete_volunteer(volunteer_id)
