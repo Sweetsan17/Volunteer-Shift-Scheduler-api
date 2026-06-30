@@ -16,5 +16,10 @@ def get_volunteers():
 
 
 @volunteer_bp.route("/<int:volunteer_id>", methods=["GET"])
-def get_volunteer():
-    return ctrl.get_volunteer()
+def get_volunteer(volunteer_id):
+    return ctrl.get_volunteer(volunteer_id)
+
+
+@volunteer_bp.route("/<int:volunteer_id>", methods=["PUT"])
+def update_volunteer(volunteer_id):
+    return ctrl.update_volunteer(volunteer_id)
