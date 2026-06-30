@@ -1,22 +1,27 @@
-from datetime import timedelta
 import os
-
+from datetime import timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
 
 
 class Config:
-    DB_USER = os.getenv("DB_USER", "root")
-    DB_PASSWORD = os.getenv("DB_PASSWORD", "root123")
-    DB_HOST = os.getenv("DB_HOST", "localhost")
-    DB_NAME = os.getenv("DB_NAME", "uki_dev_sprint_db")
+    """Base configuration, populated from environment variables."""
 
-    SQLALCHEMY_DATABASE_URI = (
-        f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
+   
+    DB_USER = os.environ.get("DB_USER", "root")
+    DB_PASSWORD = os.environ.get("DB_PASSWORD", "root123")
+    DB_HOST = os.environ.get("DB_HOST", "localhost")
+    DB_PORT = os.environ.get("DB_PORT", "3306")
+    DB_NAME = os.environ.get("DB_NAME", "volunteer_scheduler")
+
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        "DATABASE_URL",
+        f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}",
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "super-secret-key-change-me")
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(
-        minutes=int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES_MINUTES", "15"))
-    )
+    SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True}
+
+    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "dev-jwt-secret-change-me")
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=8)
