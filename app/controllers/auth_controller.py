@@ -72,3 +72,34 @@ def register():
     except Exception:
         db.session.rollback()
         return jsonify({"error": "An internal server error occurred."}), 500
+
+
+def login():
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({"error": "Request body is required."}), 400
+
+    errors = _validate_login_payload(data)
+    if errors:
+        return jsonify({"errors": errors}), 400
+
+    try:
+        email_str = str(data.get("email")).strip()
+        user = User.query.filter_by(email=email_str).first()
+
+        if not user or not user.check_password(str(data.get("password"))):
+            return jsonify({"error": "Invalid email or password."}), 401
+
+        access_token = create_access_token(identity=str(user.id))
+        return (
+            jsonify(
+                {
+                    "message": "Login successful.",
+                    "access_token": access_token,
+                    "user": user.to_dict(),
+                }
+            ),
+            200,
+        )
+    except Exception:
+        return jsonify({"error": "An internal server error occurred."}), 500
