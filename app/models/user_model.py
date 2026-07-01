@@ -13,7 +13,7 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=utc_now)
 
     def set_password(self, password):
-
+        """Hash and set the user's password."""
         self.password = generate_password_hash(password)
 
     def check_password(self, password):
