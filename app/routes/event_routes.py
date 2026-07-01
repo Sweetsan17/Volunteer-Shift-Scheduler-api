@@ -1,30 +1,44 @@
-from flask import Blueprint
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
+
+from app.controllers import event_controller
 from app.middleware import roles_required
-from app.controllers import event_controller as ctrl
 
-event_bp = Blueprint("events", __name__, url_prefix=("/api/events"))
+event_bp = Blueprint("events", __name__)
 
 
-@event_bp.route("", methods=["POST"])
+@event_bp.post("")
+@roles_required("admin", "coordinator")
 def create_event():
-    return ctrl.create_event()
+    body, status = event_controller.create_event(request.get_json(force=True) or {})
+    return jsonify(body), status
 
 
-@event_bp.route("", methods=["GET"])
-def get_events():
-    return ctrl.get_events()
+@event_bp.get("")
+@jwt_required()
+def list_events():
+    body, status = event_controller.list_events()
+    return jsonify(body), status
 
 
-@event_bp.route("/<int:event_id>", methods=["GET"])
+@event_bp.get("/<int:event_id>")
+@jwt_required()
 def get_event(event_id):
-    return ctrl.get_event(event_id)
+    body, status = event_controller.get_event(event_id)
+    return jsonify(body), status
 
 
-@event_bp.route("/<int:event_id>", methods=["PUT"])
+@event_bp.put("/<int:event_id>")
+@roles_required("admin", "coordinator")
 def update_event(event_id):
-    return ctrl.update_event(event_id)
+    body, status = event_controller.update_event(
+        event_id, request.get_json(force=True) or {}
+    )
+    return jsonify(body), status
 
 
-@event_bp.route("/<int:event_id>", methods=["DELETE"])
+@event_bp.delete("/<int:event_id>")
+@roles_required("admin", "coordinator")
 def delete_event(event_id):
-    return ctrl.delete_event(event_id)
+    body, status = event_controller.delete_event(event_id)
+    return jsonify(body), status
