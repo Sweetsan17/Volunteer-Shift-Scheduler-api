@@ -12,7 +12,7 @@ def create_app():
     db.init_app(app)
     jwt.init_app(app)
 
-    from app.models import User  # noqa: F401
+    from app.models import User, Event, Volunteer  # noqa: F401
 
     @jwt.user_lookup_loader
     def user_lookup_callback(_jwt_header, jwt_data):
@@ -23,19 +23,18 @@ def create_app():
 
     @app.route("/", methods=["GET"])
     def api_home():
-        return jsonify(
-            {
-                "message": "Volunteer Management API",
-                "endpoints": {
-                    "Volunteers": "/api/volunteers",
-                    "Events": "/api/events",
-                    "auth": {
-                        "register": "/api/auth/register",
-                        "login": "/api/auth/login",
-                    },
-                },
+        return jsonify({
+            "message": "Volunteer Event Scheduler API",
+            "version": "1.0",
+            "endpoints": {
+                "events": "/api/events",
+                "volunteers": "/api/volunteers",
+                "auth": {
+                    "register": "/api/auth/register",
+                    "login": "/api/auth/login"
+                }
             }
-        )
+        })
 
     @app.errorhandler(OperationalError)
     def handle_operational_error(err):
@@ -45,10 +44,7 @@ def create_app():
         if code == 1049:
             return jsonify({"error": "Invalid database name configured."}), 500
         if code in (2003, 2002):
-            return (
-                jsonify({"error": "MySQL server is not running or not reachable."}),
-                503,
-            )
+            return jsonify({"error": "MySQL server is not running or not reachable."}), 503
         return jsonify({"error": "Database connection failed."}), 500
 
     @app.errorhandler(ProgrammingError)
