@@ -1,8 +1,5 @@
 from app.extensions import db
-<<<<<<< HEAD
 from app.models.user_model import User
-=======
->>>>>>> c3f1acf9e84f015a3c763c1bebeb89cd5b105eb7
 from app.utils import utc_now
 
 
