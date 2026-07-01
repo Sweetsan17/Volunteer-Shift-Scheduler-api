@@ -4,7 +4,7 @@ from flask_jwt_extended import verify_jwt_in_request, current_user
 
 
 def roles_required(*roles):
-    """Decorator to restrict route access to specific user roles."""
+    
     def decorator(fn):
         @wraps(fn)
         def wrapper(*args, **kwargs):
