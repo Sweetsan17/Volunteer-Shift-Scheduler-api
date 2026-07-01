@@ -1,4 +1,5 @@
 from app.extensions import db
+from app.models.volunteer_model import Volunteer
 from app.utils import utc_now
 
 
