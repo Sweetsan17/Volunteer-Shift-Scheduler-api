@@ -4,7 +4,7 @@ from flask_jwt_extended import verify_jwt_in_request, current_user
 
 
 def roles_required(*roles):
-
+    """Decorator to restrict route access to specific user roles."""
     def decorator(fn):
         @wraps(fn)
         def wrapper(*args, **kwargs):
@@ -12,12 +12,7 @@ def roles_required(*roles):
             if not current_user:
                 return jsonify({"error": "User not found."}), 404
             if current_user.role not in roles:
-                return (
-                    jsonify({"error": "Access forbidden: insufficient permissions."}),
-                    403,
-                )
+                return jsonify({"error": "Access forbidden: insufficient permissions."}), 403
             return fn(*args, **kwargs)
-
         return wrapper
-
     return decorator
