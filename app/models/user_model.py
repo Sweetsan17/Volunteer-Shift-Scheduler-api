@@ -1,22 +1,24 @@
-from datetime import datetime
-
-from app.extensions import db, bcrypt
+from app.extensions import db
+from app.utils import utc_now
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class User(db.Model):
     __tablename__ = "users"
 
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False, index=True)
-    password_hash = db.Column(db.String(255), nullable=False)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    email = db.Column(db.String(120), nullable=False, unique=True)
+    password = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(20), nullable=False, default="volunteer")
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=utc_now)
 
-    def set_password(self, raw_password):
-        self.password_hash = bcrypt.generate_password_hash(raw_password).decode("utf-8")
+    def set_password(self, password):
+        """Hash and set the user's password."""
+        self.password = generate_password_hash(password)
 
-    def check_password(self, raw_password):
-        return bcrypt.check_password_hash(self.password_hash, raw_password)
+    def check_password(self, password):
+        """Check the given password against the stored hash."""
+        return check_password_hash(self.password, password)
 
     def to_dict(self):
         return {
