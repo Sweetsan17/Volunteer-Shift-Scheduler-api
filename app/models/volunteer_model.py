@@ -1,21 +1,18 @@
-from datetime import datetime
-
 from app.extensions import db
+from app.utils import utc_now
 
 
 class Volunteer(db.Model):
-    """A volunteer roster entry (managed by admins/coordinators)."""
-
     __tablename__ = "volunteers"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     full_name = db.Column(db.String(150), nullable=False)
-    email = db.Column(db.String(120), nullable=False, index=True)
+    email = db.Column(db.String(120), nullable=False, unique=True)
     phone = db.Column(db.String(30), nullable=True)
     age = db.Column(db.Integer, nullable=True)
     joined_date = db.Column(db.Date, nullable=True)
-    is_active = db.Column(db.Boolean, nullable=False, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=utc_now)
 
     def to_dict(self):
         return {
