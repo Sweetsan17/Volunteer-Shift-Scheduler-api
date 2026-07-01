@@ -1,30 +1,46 @@
-from flask import Blueprint
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
+
+from app.controllers import volunteer_controller
 from app.middleware import roles_required
-from app.controllers import volunteer_controller as ctrl
 
-volunteer_bp = Blueprint("volunteers", __name__, url_prefix=("/api/volunteers"))
+volunteer_bp = Blueprint("volunteers", __name__)
 
 
-@volunteer_bp.route("", methods=["POST"])
+@volunteer_bp.post("")
+@roles_required("admin", "coordinator")
 def create_volunteer():
-    return ctrl.create_volunteer()
+    body, status = volunteer_controller.create_volunteer(
+        request.get_json(force=True) or {}
+    )
+    return jsonify(body), status
 
 
-@volunteer_bp.route("", methods=["GET"])
-def get_volunteers():
-    return ctrl.get_volunteers()
+@volunteer_bp.get("")
+@jwt_required()
+def list_volunteers():
+    body, status = volunteer_controller.list_volunteers()
+    return jsonify(body), status
 
 
-@volunteer_bp.route("/<int:volunteer_id>", methods=["GET"])
+@volunteer_bp.get("/<int:volunteer_id>")
+@jwt_required()
 def get_volunteer(volunteer_id):
-    return ctrl.get_volunteer(volunteer_id)
+    body, status = volunteer_controller.get_volunteer(volunteer_id)
+    return jsonify(body), status
 
 
-@volunteer_bp.route("/<int:volunteer_id>", methods=["PUT"])
+@volunteer_bp.put("/<int:volunteer_id>")
+@roles_required("admin", "coordinator")
 def update_volunteer(volunteer_id):
-    return ctrl.update_volunteer(volunteer_id)
+    body, status = volunteer_controller.update_volunteer(
+        volunteer_id, request.get_json(force=True) or {}
+    )
+    return jsonify(body), status
 
 
-@volunteer_bp.route("/<int:volunteer_id>", methods=["DELETE"])
+@volunteer_bp.delete("/<int:volunteer_id>")
+@roles_required("admin", "coordinator")
 def delete_volunteer(volunteer_id):
-    return ctrl.delete_volunteer(volunteer_id)
+    body, status = volunteer_controller.delete_volunteer(volunteer_id)
+    return jsonify(body), status

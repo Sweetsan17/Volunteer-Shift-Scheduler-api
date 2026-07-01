@@ -1,122 +1,72 @@
-from flask import jsonify, request
 from app.extensions import db
 from app.models.event_model import Event
 
 
-def _validate_event_payload(data, event_id=None):
-    errors = []
-    if not data:
-        return jsonify({"error": "Request body is required."}), 400
-
-    event_name = data.get("event_name")
-    if event_name is None or str(event_name).strip() == "":
-        errors.append("event_name is required.")
-    elif str(event_name).strip():
-        q = event_id.query.filter(Event.event_name == str(event_name).strip())
-        if event_id:
-            q = q.filter(Event.id != event_id)
-        if q.first():
-            errors.append("Event Name already exists.")
-
-    duration = data.get("duration")
-    if duration is None or str(duration).strip() == "":
-        errors.append("duration is required.")
-
-    volunteer_role = data.get("volunteer_role")
-    if volunteer_role is None or str(volunteer_role).strip() == "":
-        errors.append("volunteer role is required.")
-
-    return errors
+def _to_bool(value, default=True):
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return default
+    return str(value).strip().lower() in ("1", "true", "yes", "y")
 
 
-def create_event():
-    data = request.get_json(silent=True)
-    if not data:
-        return jsonify({"error": "Request body is required."}), 400
-
-    errors = _validate_event_payload(data)
-    if errors:
-        return jsonify({"errors": errors}), 400
-
+def create_event(data):
     try:
         event = Event(
-            event_name=data.get("event_name").strip(),
-            duration=float(data.get("duration")).strip(),
-            volunteer_role=data.get("volunteer_role").strip(),
-            description=data.get("description").strip(),
-            is_active=data.get("is_active", True),
+            event_name=data["event_name"],
+            volunteers_needed=int(data["volunteers_needed"]),
+            duration_hours=float(data["duration_hours"]),
+            description=data.get("description"),
+            is_available=_to_bool(data.get("is_available"), default=True),
         )
-        db.session.add(event)
-        db.session.commit()
-        return (
-            jsonify(
-                {
-                    "message": "Event created successfully.",
-                    "event": event.to_dict(),
-                }
-            ),
-            201,
-        )
-    except Exception:
-        db.session.rollback()
-        return jsonify({"error": "An internal server error occurred."}), 500
+    except (KeyError, ValueError, TypeError) as exc:
+        return {"error": f"Invalid event data: {exc}"}, 400
+
+    db.session.add(event)
+    db.session.commit()
+    return {"message": "Event created", "event": event.to_dict()}, 201
 
 
-def get_events():
-    events = Event.query.all()
-    return jsonify({"events": [s.to_dict() for s in events]}), 200
+def list_events():
+    events = Event.query.order_by(Event.id.desc()).all()
+    return {"events": [e.to_dict() for e in events]}, 200
 
 
 def get_event(event_id):
     event = Event.query.get(event_id)
     if not event:
-        return jsonify({"error": "Event not found."}), 404
-    return jsonify({"event": event.to_dict()}), 200
+        return {"error": "Event not found"}, 404
+    return {"event": event.to_dict()}, 200
 
 
-def update_event(event_id):
+def update_event(event_id, data):
     event = Event.query.get(event_id)
     if not event:
-        return jsonify({"error": "Event not found."}), 404
+        return {"error": "Event not found"}, 404
 
-    data = request.get_json(silent=True)
-    if not data:
-        return jsonify({"error": "No data provided to update."}), 400
-
-    errors = _validate_event_payload(data, event_id=event_id)
-    if errors:
-        return jsonify({"errors": errors}), 400
     try:
-        event.full_name = data.get("full_name").strip()
-        event.email = data.get("email").strip()
-        event.age = int(data.get("age"))
+        if "event_name" in data:
+            event.event_name = data["event_name"]
+        if "volunteers_needed" in data:
+            event.volunteers_needed = int(data["volunteers_needed"])
+        if "duration_hours" in data:
+            event.duration_hours = float(data["duration_hours"])
+        if "description" in data:
+            event.description = data["description"]
+        if "is_available" in data:
+            event.is_available = _to_bool(data["is_available"])
+    except (ValueError, TypeError) as exc:
+        return {"error": f"Invalid event data: {exc}"}, 400
 
-        if "is_active" in data:
-            event.is_active = bool(data.get("is_active"))
-
-        db.session.commit()
-        return (
-            jsonify(
-                {
-                    "message": "Event updated successfully.",
-                    "event": event.to_dict(),
-                }
-            ),
-            200,
-        )
-    except Exception:
-        db.session.rollback()
-        return jsonify({"error": "An internal server error occurred."}), 500
+    db.session.commit()
+    return {"message": "Event updated", "event": event.to_dict()}, 200
 
 
 def delete_event(event_id):
     event = Event.query.get(event_id)
     if not event:
-        return jsonify({"error": "Event not found."}), 404
-    try:
-        db.session.delete(event)
-        db.session.commit()
-        return jsonify({"message": "Event deleted successfully."}), 200
-    except Exception:
-        db.session.rollback()
-        return jsonify({"error": "An internal server error occurred."}), 500
+        return {"error": "Event not found"}, 404
+
+    db.session.delete(event)
+    db.session.commit()
+    return {"message": "Event deleted"}, 200

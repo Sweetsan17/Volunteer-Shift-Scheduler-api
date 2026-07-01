@@ -1,15 +1,17 @@
-from flask import Blueprint
+from flask import Blueprint, jsonify, request
 
-from app.controllers import auth_controller as ctrl
+from app.controllers import auth_controller
 
-auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
+auth_bp = Blueprint("auth", __name__)
 
 
-@auth_bp.route("/register", methods=["POST"])
+@auth_bp.post("/register")
 def register():
-    return ctrl.register()
+    body, status = auth_controller.register_user(request.get_json(force=True) or {})
+    return jsonify(body), status
 
 
-@auth_bp.route("/login", methods=["POST"])
+@auth_bp.post("/login")
 def login():
-    return ctrl.login()
+    body, status = auth_controller.login_user(request.get_json(force=True) or {})
+    return jsonify(body), status
