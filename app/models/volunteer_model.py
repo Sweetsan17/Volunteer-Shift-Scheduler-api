@@ -1,5 +1,6 @@
 from app.extensions import db
 from app.models.user_model import User
+from app.utils import utc_now
 
 
 class Volunteer(db.Model):
