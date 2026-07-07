@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 
 from app.config import Config
 from app.extensions import db, jwt
@@ -9,10 +10,11 @@ from sqlalchemy.exc import OperationalError, ProgrammingError
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    CORS(app)
     db.init_app(app)
     jwt.init_app(app)
 
-    from app.models import User, Event, Volunteer  
+    from app.models import User, Event, Shift, Signup  # noqa: F401
 
     @jwt.user_lookup_loader
     def user_lookup_callback(_jwt_header, jwt_data):
@@ -24,16 +26,20 @@ def create_app():
     @app.route("/", methods=["GET"])
     def api_home():
         return jsonify({
-            "message": "Volunteer Event Scheduler API",
-            "version": "1.0",
+            "message": "Volunteer Shift Scheduler API",
+            "version": "2.0",
             "endpoints": {
-                "events": "/api/events",
-                "volunteers": "/api/volunteers",
                 "auth": {
                     "register": "/api/auth/register",
-                    "login": "/api/auth/login"
-                }
-            }
+                    "login": "/api/auth/login",
+                },
+                "events": "/api/events",
+                "shifts": "/api/shifts",
+                "users": {
+                    "my_shifts": "/api/users/me/shifts",
+                    "my_hours": "/api/users/me/hours",
+                },
+            },
         })
 
     @app.errorhandler(OperationalError)
